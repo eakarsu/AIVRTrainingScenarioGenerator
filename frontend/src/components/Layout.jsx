@@ -28,6 +28,40 @@ export default function Layout({ user, onLogout, children }) {
             <span className="nav-icon">&#9776;</span>
             Dashboard
           </NavLink>
+          <NavLink to="/custom-views" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">&#9737;</span>
+            VR Views
+          </NavLink>
+
+          <div className="nav-section">AI Tools</div>
+          <NavLink to="/ai/generate-scenario" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">🎯</span>
+            Scenario Generator
+          </NavLink>
+          <NavLink to="/ai/grade-assessment" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">📝</span>
+            Assessment Grader
+          </NavLink>
+          <NavLink to="/ai/adaptive-path" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">🧭</span>
+            Adaptive Path
+          </NavLink>
+          <NavLink to="/ai/performance-prediction" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">📈</span>
+            Performance Prediction
+          </NavLink>
+          <NavLink to="/ai/incident-simulation" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">🚨</span>
+            Incident Simulation
+          </NavLink>
+          <NavLink to="/ai/skill-gap" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">🎯</span>
+            Skill Gap ID
+          </NavLink>
+          <NavLink to="/ai/scenario-randomization" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">🎲</span>
+            Scenario Variants
+          </NavLink>
 
           <div className="nav-section">AI-Powered</div>
           {aiFeatures.map(f => (

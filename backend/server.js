@@ -62,6 +62,12 @@ app.use('/api/gap-no-webhooks', require('./routes/gapNoWebhooks'));
 app.use('/api/gap-no-payment-subscription-integration-for-b2b-sales', require('./routes/gapNoPaymentSubscriptionIntegrationForB2bSales'));
 app.use('/api/gap-no-scorm-xapi-lms-export', require('./routes/gapNoScormXapiLmsExport'));
 
+// === Custom Views (mounted BEFORE 404 handler) ===
+app.use('/api/custom-views', require('./routes/customViews'));
+
+// 404 fallback for unknown /api routes
+app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));
+
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
   } catch (err) {
     console.error('Failed to start:', err);

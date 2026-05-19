@@ -28,6 +28,10 @@ export default function Layout({ user, onLogout, children }) {
             <span className="nav-icon">&#9776;</span>
             Dashboard
           </NavLink>
+          <NavLink to="/custom-views" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span className="nav-icon">&#9737;</span>
+            VR Views
+          </NavLink>
 
           <div className="nav-section">AI Tools</div>
           <NavLink to="/ai/generate-scenario" className={({ isActive }) => isActive ? 'active' : ''}>

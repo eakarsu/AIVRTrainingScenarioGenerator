@@ -31,6 +31,11 @@ import GapNoMultiLanguageSupport from './pages/GapNoMultiLanguageSupport'
 import GapNoWebhooks from './pages/GapNoWebhooks'
 import GapNoPaymentSubscriptionIntegrationForB2bSales from './pages/GapNoPaymentSubscriptionIntegrationForB2bSales'
 import GapNoScormXapiLmsExport from './pages/GapNoScormXapiLmsExport'
+import CustomViewsPage from './pages/CustomViewsPage'
+
+function ProtectedRoute({ children }) {
+  return children;
+}
 
 function App() {
   const [user, setUser] = useState(null);
@@ -104,6 +109,7 @@ function App() {
       <Route path="/gap-no-webhooks" element={<ProtectedRoute><GapNoWebhooks /></ProtectedRoute>} />
       <Route path="/gap-no-payment-subscription-integration-for-b2b-sales" element={<ProtectedRoute><GapNoPaymentSubscriptionIntegrationForB2bSales /></ProtectedRoute>} />
       <Route path="/gap-no-scorm-xapi-lms-export" element={<ProtectedRoute><GapNoScormXapiLmsExport /></ProtectedRoute>} />
+      <Route path="/custom-views" element={<CustomViewsPage />} />
       <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Layout>

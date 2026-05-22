@@ -14,6 +14,11 @@ import AIScenarioRandomization from './pages/AIScenarioRandomization';
 import Layout from './components/Layout';
 import Toast from './components/Toast';
 import './styles/index.css';
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
+
 // === Batch 08 Gaps & Frontend Mounts ===
 import CfAdaptiveLearningPathsAdjustingScenarioDifficultyBy from './pages/CfAdaptiveLearningPathsAdjustingScenarioDifficultyBy'
 import CfScenarioRandomizationGeneratingTrainingVariationsFromDomain from './pages/CfScenarioRandomizationGeneratingTrainingVariationsFromDomain'
@@ -82,6 +87,10 @@ function App() {
     <Router>
       <Layout user={user} onLogout={handleLogout}>
         <Routes>
+        <Route path="/insights/timeline" element={<ProtectedRoute><TimelineView /></ProtectedRoute>} />
+        <Route path="/codex/custom-viz" element={<ProtectedRoute><CodexCustomVizFeature /></ProtectedRoute>} />
+        <Route path="/codex/operations" element={<ProtectedRoute><CodexOperationsFeature /></ProtectedRoute>} />
+
           <Route path="/" element={<Dashboard addToast={addToast} />} />
           <Route path="/feature/:featureKey" element={<FeaturePage addToast={addToast} />} />
           <Route path="/feature/:featureKey/:id" element={<DetailPage addToast={addToast} />} />

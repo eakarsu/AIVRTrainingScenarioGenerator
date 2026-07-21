@@ -8,6 +8,7 @@ const User = sequelize.define('User', {
   firstName: { type: DataTypes.STRING, allowNull: false },
   lastName: { type: DataTypes.STRING, allowNull: false },
   role: { type: DataTypes.STRING, defaultValue: 'user' },
+  tenantId: { type: DataTypes.STRING, allowNull: true },
 }, { timestamps: true });
 
 const SafetyTrainingScenario = sequelize.define('SafetyTrainingScenario', {

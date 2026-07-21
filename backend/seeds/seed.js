@@ -14,19 +14,25 @@ const {
   CertificationRecord,
 } = require('../models');
 
+if(process.env.NODE_ENV==='production'||process.env.ALLOW_DESTRUCTIVE_DEMO_SEED!=='true'){console.error('Refusing destructive demo seed outside an explicitly enabled non-production environment.');process.exit(2);}
 async function seed() {
   try {
+    const adminEmail = (process.env.SEED_ADMIN_EMAIL || '').trim().toLowerCase();
+    const demoPassword = process.env.SEED_DEMO_PASSWORD || '';
+    const tenantId = (process.env.TENANT_ID || '').trim();
+    if (!adminEmail || !tenantId || demoPassword.length < 12) throw new Error('Seed admin email, tenant, and a 12+ character password are required');
     await sequelize.sync({ force: true });
     console.log('Database synced.');
 
     // Seed User
-    const hashedPassword = await bcrypt.hash('password123', 10);
+    const hashedPassword = await bcrypt.hash(demoPassword, 12);
     await User.create({
-      email: 'admin@vrtraining.com',
+      email: adminEmail,
       password: hashedPassword,
       firstName: 'Admin',
       lastName: 'User',
       role: 'admin',
+      tenantId,
     });
     console.log('User seeded.');
 

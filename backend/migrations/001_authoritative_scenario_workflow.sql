@@ -1,0 +1,21 @@
+BEGIN;
+ALTER TABLE IF EXISTS "Users" ADD COLUMN IF NOT EXISTS "tenantId" TEXT;
+CREATE TABLE IF NOT EXISTS scenario_workflows (
+ id UUID PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id TEXT NOT NULL, idempotency_key TEXT NOT NULL, title TEXT NOT NULL,
+ status TEXT NOT NULL DEFAULT 'draft', version INTEGER NOT NULL DEFAULT 1, creator_id TEXT NOT NULL, reviewer_id TEXT,
+ timeline_version TEXT, brand_version TEXT, locale_set JSONB NOT NULL DEFAULT '[]', moderation_status TEXT NOT NULL DEFAULT 'pending', watermark_policy TEXT NOT NULL DEFAULT 'required', disclosure_policy TEXT NOT NULL DEFAULT 'required', approved_at TIMESTAMPTZ, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(tenant_id,idempotency_key), UNIQUE(tenant_id,id));
+CREATE TABLE IF NOT EXISTS scenario_assets (
+ id BIGSERIAL PRIMARY KEY, tenant_id TEXT NOT NULL, workflow_id UUID NOT NULL, asset_uri TEXT NOT NULL, asset_type TEXT NOT NULL,
+ rights_basis TEXT NOT NULL, consent_status TEXT NOT NULL, checksum TEXT NOT NULL, metadata JSONB NOT NULL DEFAULT '{}', created_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(tenant_id,workflow_id,checksum));
+CREATE TABLE IF NOT EXISTS scenario_deliveries (
+ id BIGSERIAL PRIMARY KEY, tenant_id TEXT NOT NULL, workflow_id UUID NOT NULL, provider_type TEXT NOT NULL,
+ idempotency_key TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN('pending','acknowledged','retrying','dead_letter')),
+ attempt_count INTEGER NOT NULL DEFAULT 0, next_attempt_at TIMESTAMPTZ, receipt JSONB, usage JSONB NOT NULL DEFAULT '{}', last_error TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(tenant_id,provider_type,idempotency_key));
+CREATE TABLE IF NOT EXISTS scenario_evaluations (
+ id BIGSERIAL PRIMARY KEY, tenant_id TEXT NOT NULL, workflow_id UUID NOT NULL, fixture_key TEXT NOT NULL, quality NUMERIC,
+ timing NUMERIC, layout NUMERIC, accessibility NUMERIC, multilingual NUMERIC, deterministic_hash TEXT, expected JSONB NOT NULL DEFAULT '{}', actual JSONB NOT NULL DEFAULT '{}', created_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(tenant_id,workflow_id,fixture_key));
+CREATE TABLE IF NOT EXISTS scenario_workflow_audit (id BIGSERIAL PRIMARY KEY, tenant_id TEXT NOT NULL, workflow_id UUID NOT NULL, actor_id TEXT NOT NULL, action TEXT NOT NULL, from_status TEXT, to_status TEXT, record_version INTEGER NOT NULL, evidence JSONB NOT NULL DEFAULT '{}', created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE OR REPLACE FUNCTION reject_scenario_audit_mutation() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'scenario audit is append-only'; END $$;
+DROP TRIGGER IF EXISTS scenario_audit_append_only ON scenario_workflow_audit;
+CREATE TRIGGER scenario_audit_append_only BEFORE UPDATE OR DELETE ON scenario_workflow_audit FOR EACH ROW EXECUTE FUNCTION reject_scenario_audit_mutation();
+COMMIT;

@@ -8,24 +8,26 @@ const { authenticateToken, JWT_SECRET } = require('../middleware/auth');
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, firstName, lastName, role } = req.body;
+    const { email, password, firstName, lastName } = req.body;
+    if (typeof password !== 'string' || password.length < 12) return res.status(400).json({ error: 'password must be at least 12 characters' });
 
     const existing = await User.findOne({ where: { email } });
     if (existing) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
     const user = await User.create({
       email,
       password: hashedPassword,
       firstName,
       lastName,
-      role: role || 'user',
+      role: 'learner',
+      tenantId: require('crypto').randomUUID(),
     });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, tenantId: user.tenantId },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -59,9 +61,10 @@ router.post('/login', async (req, res) => {
     if (!valid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+    if (!user.tenantId) return res.status(403).json({ error: 'account has no tenant assignment' });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, tenantId: user.tenantId },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -84,7 +87,7 @@ router.post('/login', async (req, res) => {
 // GET /api/auth/me
 router.get('/me', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
+    const user = await User.findOne({ where: { id: req.user.id, tenantId: req.user.tenantId },
       attributes: { exclude: ['password'] },
     });
     if (!user) {

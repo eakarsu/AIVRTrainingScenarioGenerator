@@ -4,18 +4,25 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { sequelize } = require('./models');
 const { generalLimiter } = require('./middleware/rateLimiter');
+const { authenticateToken } = require('./middleware/auth');
 
 const app = express();
-const PORT = process.env.BACKEND_PORT || 3001;
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+const PORT = Number(process.env.BACKEND_PORT);
+if (!Number.isInteger(PORT) || PORT < 1) throw new Error('BACKEND_PORT is required');
+const CLIENT_URL = process.env.CLIENT_URL;
+if (!CLIENT_URL) throw new Error('CLIENT_URL is required');
 
 app.use(helmet());
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(generalLimiter);
 
-// Routes
+app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api', authenticateToken);
+app.use('/api/scenario-workflow', require('./routes/scenarioWorkflow'));
+app.use(/^\/api\/(?:ai(?:\/|$)|gap-|integrations?(?:\/|$)|webhooks?(?:\/|$)|adaptive-learning-paths|scenario-randomization|performance-prediction|skill-gap-identification|incident-simulation|scorm-xapi-export)/, (_req,res)=>res.status(503).json({error:'generated/direct-provider endpoints are quarantined; use scenario-workflow deliveries'}));
+// Routes
 app.use('/api/safety-training', require('./routes/safetyTraining'));
 app.use('/api/surgical-procedures', require('./routes/surgicalProcedure'));
 app.use('/api/customer-service', require('./routes/customerService'));
@@ -28,26 +35,12 @@ app.use('/api/training-modules', require('./routes/trainingModule'));
 app.use('/api/certifications', require('./routes/certification'));
 app.use('/api/ai', require('./routes/aiFeatures'));
 
-// Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
-
 async function start() {
   try {
     await sequelize.authenticate();
     console.log('Database connected.');
-    // Use force: false to avoid data loss
-    await sequelize.sync({ force: false });
-    // Ensure ai_results table exists
-    await sequelize.query(`
-      CREATE TABLE IF NOT EXISTS ai_results (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER,
-        endpoint VARCHAR(255),
-        input_data JSONB,
-        result JSONB,
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
+    const [ready] = await sequelize.query("SELECT to_regclass('public.scenario_workflows') AS workflow, to_regclass('public.scenario_workflow_audit') AS audit");
+    if (!ready[0].workflow || !ready[0].audit) throw new Error('database migrations are pending; run npm run migrate');
     app.use('/api/adaptive-learning-paths', require('./routes/adaptiveLearningPaths')); app.use('/api/scenario-randomization', require('./routes/scenarioRandomization')); app.use('/api/performance-prediction', require('./routes/performancePrediction')); app.use('/api/skill-gap-identification', require('./routes/skillGapIdentification')); app.use('/api/incident-simulation', require('./routes/incidentSimulation')); app.use('/api/scorm-xapi-export', require('./routes/scormXapiExport'));
 
 // === Batch 08 Gaps & Frontend Mounts ===

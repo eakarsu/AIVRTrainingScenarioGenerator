@@ -23,8 +23,8 @@ export default function Login({ onLogin, addToast }) {
   };
 
   const autoFill = () => {
-    setEmail('admin@vrtraining.com');
-    setPassword('password123');
+    setEmail(import.meta.env.VITE_DEMO_EMAIL || '');
+    setPassword(import.meta.env.VITE_DEMO_PASSWORD || '');
   };
 
   return (

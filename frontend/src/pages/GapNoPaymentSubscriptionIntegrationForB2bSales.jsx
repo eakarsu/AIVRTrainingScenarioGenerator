@@ -35,7 +35,7 @@ export default function GapNoPaymentSubscriptionIntegrationForB2bSales() {
       const res = await fetch(`${API_BASE}/api/gap-no-payment-subscription-integration-for-b2b-sales/history`, { headers: getHeaders() })
       const data = await res.json()
       setHistory(Array.isArray(data.history) ? data.history : [])
-    } catch (_) { setHistory([]) }
+    } catch { setHistory([]) }
   }
 
   return (

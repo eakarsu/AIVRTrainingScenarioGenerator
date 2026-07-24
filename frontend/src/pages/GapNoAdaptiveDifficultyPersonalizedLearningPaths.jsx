@@ -35,7 +35,7 @@ export default function GapNoAdaptiveDifficultyPersonalizedLearningPaths() {
       const res = await fetch(`${API_BASE}/api/gap-no-adaptive-difficulty-personalized-learning-paths/history`, { headers: getHeaders() })
       const data = await res.json()
       setHistory(Array.isArray(data.history) ? data.history : [])
-    } catch (_) { setHistory([]) }
+    } catch { setHistory([]) }
   }
 
   return (

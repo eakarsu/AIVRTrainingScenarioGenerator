@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import FeaturePage from './pages/FeaturePage';
@@ -43,16 +43,13 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [toasts, setToasts] = useState([]);
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
+    if (!token || !savedUser) return null;
+    try { return JSON.parse(savedUser); } catch { return null; }
+  });
+  const [toasts, setToasts] = useState([]);
 
   const addToast = (message, type = 'success') => {
     const id = Date.now();

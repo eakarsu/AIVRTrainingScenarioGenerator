@@ -35,7 +35,7 @@ export default function CfPerformancePredictionForecastingCertificationPassFail(
       const res = await fetch(`${API_BASE}/api/cf-performance-prediction-forecasting-certification-pass-fail/history`, { headers: getHeaders() })
       const data = await res.json()
       setHistory(Array.isArray(data.history) ? data.history : [])
-    } catch (_) { setHistory([]) }
+    } catch { setHistory([]) }
   }
 
   return (

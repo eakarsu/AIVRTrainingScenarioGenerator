@@ -1,8 +1,6 @@
 const axios = require('axios');
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
 
-const MODEL = process.env.OPENROUTER_MODEL || 'anthropic/claude-3-5-sonnet-20241022';
-
 function parseAIJson(text) {
   try { return JSON.parse(text); } catch (e) {}
   const stripped = text.replace(/```(?:json)?\n?/g, '').replace(/```/g, '').trim();
@@ -13,10 +11,14 @@ function parseAIJson(text) {
 }
 
 async function callOpenRouter(prompt, systemPrompt) {
+  const baseUrl = (process.env.OPENROUTER_BASE_URL || '').replace(/\/$/, '');
+  if (baseUrl !== 'https://openrouter.ai/api/v1') throw new Error('OPENROUTER_BASE_URL must be https://openrouter.ai/api/v1');
+  if (!process.env.OPENROUTER_API_KEY) throw new Error('OPENROUTER_API_KEY is required');
+  if (!process.env.OPENROUTER_MODEL) throw new Error('OPENROUTER_MODEL is required');
   const response = await axios.post(
-    'https://openrouter.ai/api/v1/chat/completions',
+    `${baseUrl}/chat/completions`,
     {
-      model: MODEL,
+      model: process.env.OPENROUTER_MODEL,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt }
@@ -33,7 +35,9 @@ async function callOpenRouter(prompt, systemPrompt) {
       }
     }
   );
-  return response.data.choices[0].message.content;
+  const content = response.data?.choices?.[0]?.message?.content;
+  if (typeof content !== 'string' || !content.trim()) throw new Error('OpenRouter returned an empty response');
+  return content;
 }
 
 module.exports = { callOpenRouter, parseAIJson };

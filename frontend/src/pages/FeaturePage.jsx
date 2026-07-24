@@ -22,7 +22,7 @@ export default function FeaturePage({ addToast }) {
     try {
       const res = await feature.api.getAll();
       setItems(res.data);
-    } catch (err) {
+    } catch {
       addToast('Failed to load data', 'error');
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ export default function FeaturePage({ addToast }) {
       await feature.api.delete(id);
       addToast('Deleted successfully', 'success');
       loadItems();
-    } catch (err) {
+    } catch {
       addToast('Delete failed', 'error');
     }
   };

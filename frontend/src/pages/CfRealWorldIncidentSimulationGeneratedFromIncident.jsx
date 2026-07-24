@@ -35,7 +35,7 @@ export default function CfRealWorldIncidentSimulationGeneratedFromIncident() {
       const res = await fetch(`${API_BASE}/api/cf-real-world-incident-simulation-generated-from-incident-reports/history`, { headers: getHeaders() })
       const data = await res.json()
       setHistory(Array.isArray(data.history) ? data.history : [])
-    } catch (_) { setHistory([]) }
+    } catch { setHistory([]) }
   }
 
   return (

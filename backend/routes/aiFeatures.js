@@ -6,13 +6,23 @@ const { callOpenRouter, parseAIJson } = require('./ai');
 const router = express.Router();
 
 async function persist(userId, endpoint, inputData, result) {
-  try {
-    await sequelize.query(
-      'INSERT INTO ai_results (user_id, endpoint, input_data, result) VALUES ($1, $2, $3, $4)',
-      { bind: [userId, endpoint, JSON.stringify(inputData), JSON.stringify(result)] }
-    );
-  } catch (e) { console.error('persist ai_results failed:', e.message); }
+  await sequelize.query(
+    'INSERT INTO ai_results (user_id, endpoint, input_data, result) VALUES ($1, $2, $3, $4)',
+    { bind: [userId, endpoint, JSON.stringify(inputData), JSON.stringify(result)] }
+  );
 }
+
+router.get('/history', authenticateToken, async (req, res) => {
+  try {
+    const [history] = await sequelize.query(
+      'SELECT id, endpoint, input_data, result, created_at FROM ai_results WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50',
+      { bind: [req.user.id] }
+    );
+    res.json({ history });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // POST /api/ai/generate-scenario — generate a training scenario from inputs
 router.post('/generate-scenario', authenticateToken, aiRateLimiter, async (req, res) => {

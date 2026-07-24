@@ -20,7 +20,7 @@ export default function DetailPage({ addToast }) {
     try {
       const res = await feature.api.getOne(id);
       setItem(res.data);
-    } catch (err) {
+    } catch {
       addToast('Failed to load item', 'error');
       navigate(`/feature/${featureKey}`);
     } finally {
@@ -34,7 +34,7 @@ export default function DetailPage({ addToast }) {
       await feature.api.delete(id);
       addToast('Deleted successfully', 'success');
       navigate(`/feature/${featureKey}`);
-    } catch (err) {
+    } catch {
       addToast('Delete failed', 'error');
     }
   };
@@ -45,7 +45,7 @@ export default function DetailPage({ addToast }) {
       addToast('Updated successfully', 'success');
       setShowModal(false);
       loadItem();
-    } catch (err) {
+    } catch {
       addToast('Update failed', 'error');
     }
   };

@@ -35,7 +35,7 @@ export default function CfScenarioRandomizationGeneratingTrainingVariationsFromD
       const res = await fetch(`${API_BASE}/api/cf-scenario-randomization-generating-training-variations-from-domain-rules/history`, { headers: getHeaders() })
       const data = await res.json()
       setHistory(Array.isArray(data.history) ? data.history : [])
-    } catch (_) { setHistory([]) }
+    } catch { setHistory([]) }
   }
 
   return (

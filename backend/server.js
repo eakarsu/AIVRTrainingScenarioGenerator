@@ -21,7 +21,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Dat
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api', authenticateToken);
 app.use('/api/scenario-workflow', require('./routes/scenarioWorkflow'));
-app.use(/^\/api\/(?:ai(?:\/|$)|gap-|integrations?(?:\/|$)|webhooks?(?:\/|$)|adaptive-learning-paths|scenario-randomization|performance-prediction|skill-gap-identification|incident-simulation|scorm-xapi-export)/, (_req,res)=>res.status(503).json({error:'generated/direct-provider endpoints are quarantined; use scenario-workflow deliveries'}));
+app.use(/^\/api\/(?:gap-|integrations?(?:\/|$)|webhooks?(?:\/|$)|adaptive-learning-paths|scenario-randomization|performance-prediction|skill-gap-identification|incident-simulation|scorm-xapi-export)/, (_req,res)=>res.status(503).json({error:'generated/direct-provider endpoints are quarantined; use scenario-workflow deliveries'}));
 // Routes
 app.use('/api/safety-training', require('./routes/safetyTraining'));
 app.use('/api/surgical-procedures', require('./routes/surgicalProcedure'));

@@ -24,7 +24,7 @@ export default function AIScenarioRandomization({ addToast }) {
         return;
       }
       let baseScenario = form.baseScenario;
-      try { baseScenario = JSON.parse(form.baseScenario); } catch {}
+      try { baseScenario = JSON.parse(form.baseScenario); } catch { baseScenario = form.baseScenario; }
       const r = await aiAPI.scenarioRandomization({
         baseScenario,
         variantCount: parseInt(form.variantCount, 10) || 3,

@@ -35,7 +35,7 @@ export default function GapNoCompletionCertificatePdfGeneration() {
       const res = await fetch(`${API_BASE}/api/gap-no-completion-certificate-pdf-generation/history`, { headers: getHeaders() })
       const data = await res.json()
       setHistory(Array.isArray(data.history) ? data.history : [])
-    } catch (_) { setHistory([]) }
+    } catch { setHistory([]) }
   }
 
   return (

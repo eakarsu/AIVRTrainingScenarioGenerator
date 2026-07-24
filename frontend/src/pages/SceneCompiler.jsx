@@ -59,7 +59,7 @@ export default function SceneCompiler({ addToast }) {
       await sceneCompilerAPI.delete(id);
       setScenes(prev => prev.filter(s => s.id !== id));
       if (activeScene?.id === id) setActiveScene(null);
-    } catch (err) {
+    } catch {
       addToast('Delete failed', 'error');
     }
   };

@@ -11,7 +11,6 @@ export default function AdaptiveAssessment({ addToast }) {
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [history, setHistory] = useState([]);
-  const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pastSessions, setPastSessions] = useState([]);
 
@@ -45,7 +44,6 @@ export default function AdaptiveAssessment({ addToast }) {
       setSession(r.data);
       setCurrentQuestion(r.data?.nextQuestion || null);
       setHistory([]);
-      setFeedback(null);
       addToast('Adaptive session started', 'success');
     } catch (err) {
       addToast(err.response?.data?.error || 'Failed to start session', 'error');
@@ -74,7 +72,6 @@ export default function AdaptiveAssessment({ addToast }) {
           correct: result?.correct,
         },
       ]);
-      setFeedback(result);
       setUserAnswer('');
       if (result?.nextQuestion) {
         setCurrentQuestion(result.nextQuestion);

@@ -66,7 +66,7 @@ export default function Login({ onLogin, addToast }) {
 
         <div className="auto-fill-btn">
           <button type="button" onClick={autoFill}>
-            Quick Login - Fill Demo Credentials
+            Auto Fill Demo Credentials
           </button>
         </div>
       </div>
